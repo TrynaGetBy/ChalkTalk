@@ -1,5 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  // THEME TOGGLE
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "light") document.body.classList.add("light");
+
+  window.toggleTheme = function () {
+    document.body.classList.toggle("light");
+    localStorage.setItem(
+      "theme",
+      document.body.classList.contains("light") ? "light" : "dark"
+    );
+  };
+
   let articles = JSON.parse(localStorage.getItem("articles")) || [];
 
   window.goTo = function (id) {
@@ -34,17 +46,16 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
   };
 
-  window.deleteArticle = function (index) {
+  window.deleteArticle = function (i) {
     if (!confirm("Delete this article permanently?")) return;
-
-    articles.splice(index, 1);
+    articles.splice(i, 1);
     localStorage.setItem("articles", JSON.stringify(articles));
     render();
   };
 
-  window.react = function (index, emoji) {
-    articles[index].reactions[emoji] =
-      (articles[index].reactions[emoji] || 0) + 1;
+  window.react = function (i, e) {
+    articles[i].reactions[e] =
+      (articles[i].reactions[e] || 0) + 1;
     localStorage.setItem("articles", JSON.stringify(articles));
     render();
   };
@@ -56,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderList(container, allowDelete) {
     container.innerHTML = "";
-
     articles.forEach((a, i) => {
       const div = document.createElement("div");
       div.className = "article";
@@ -67,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <small>${new Date(a.date).toDateString()}</small>
         <div class="emoji">
           ${["🔥","❤️","😂","😮","😢","👏","👍","🎓","💡","✨"]
-            .map(e => `<span onclick="react(${i}, '${e}')">${e} ${(a.reactions[e]||0)}</span>`)
+            .map(x => `<span onclick="react(${i}, '${x}')">${x} ${(a.reactions[x]||0)}</span>`)
             .join("")}
         </div>
         ${allowDelete ? `<button class="delete" onclick="deleteArticle(${i})">Delete</button>` : ""}
