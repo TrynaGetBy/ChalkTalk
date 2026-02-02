@@ -14,17 +14,29 @@
   --muted: #94a3b8;
 }
 
+body.light {
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --accent: #2563eb;
+  --text: #1f2937;
+  --muted: #6b7280;
+}
+
 body {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
+  transition: background 0.3s, color 0.3s;
 }
 
 header {
-  background: #020617;
+  background: var(--card);
   padding: 20px;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .logo {
@@ -33,22 +45,28 @@ header {
   color: var(--accent);
 }
 
-nav {
-  margin-top: 12px;
-}
-
 nav button {
   background: none;
   border: none;
   color: var(--text);
   font-size: 16px;
   font-weight: 600;
-  margin-right: 16px;
+  margin-right: 14px;
   cursor: pointer;
 }
 
 nav button:hover {
   color: var(--accent);
+}
+
+.toggle {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 section {
@@ -78,9 +96,9 @@ section.active {
 input, textarea {
   width: 100%;
   padding: 12px;
-  background: #020617;
+  background: var(--bg);
   color: var(--text);
-  border: 1px solid #1e293b;
+  border: 1px solid #334155;
   border-radius: 8px;
   font-size: 16px;
 }
@@ -91,7 +109,7 @@ textarea {
 
 button.main {
   background: var(--accent);
-  color: #020617;
+  color: white;
   border: none;
   padding: 10px 16px;
   border-radius: 8px;
@@ -120,14 +138,17 @@ small {
 <body>
 
 <header>
-  <div class="logo">The Student Lens</div>
-  <nav>
-    <button onclick="goTo('home')">Home</button>
-    <button onclick="goTo('articles')">Articles</button>
-    <button onclick="goTo('create')">Create</button>
-    <button onclick="goTo('news')">News</button>
-    <button onclick="goTo('about')">About Us</button>
-  </nav>
+  <div>
+    <div class="logo">The Student Lens</div>
+    <nav>
+      <button onclick="goTo('home')">Home</button>
+      <button onclick="goTo('articles')">Articles</button>
+      <button onclick="goTo('create')">Create</button>
+      <button onclick="goTo('news')">News</button>
+      <button onclick="goTo('about')">About Us</button>
+    </nav>
+  </div>
+  <button class="toggle" onclick="toggleTheme()">🌙 / ☀️</button>
 </header>
 
 <section id="home" class="active">
@@ -158,12 +179,10 @@ small {
 
 <section id="news">
   <h1>Global Education Inequality 🌍</h1>
-
-  <div class="article">📚 Over 250 million children worldwide are out of school.</div>
-  <div class="article">🏫 Many schools in Africa lack electricity and textbooks.</div>
-  <div class="article">🚸 Girls face major barriers to education in some regions.</div>
-  <div class="article">💻 Digital inequality blocks access to online learning.</div>
-  <div class="article">🌍 Children in conflict zones are twice as likely to miss school.</div>
+  <div class="article">📚 Over 250 million children are out of school.</div>
+  <div class="article">🏫 Schools lack resources in many regions.</div>
+  <div class="article">🚸 Girls face education barriers worldwide.</div>
+  <div class="article">💻 Digital inequality blocks learning.</div>
 </section>
 
 <section id="about">
@@ -173,7 +192,6 @@ small {
   <p><strong>Phone:</strong> 07407362261</p>
 </section>
 
-<!-- LINK TO JS -->
 <script src="script.js"></script>
 </body>
 </html>
