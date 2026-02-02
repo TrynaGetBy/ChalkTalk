@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Student Lens</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #cfe9ff;
+    }
+
+    nav {
+        background: #1e3a8a;
+        padding: 15px;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    section {
+        display: none;
+        padding: 30px;
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    section.active {
+        display: block;
+    }
+
+    .article {
+        background: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+    }
+
+    .emoji-bar span {
+        cursor: pointer;
+        margin-right: 8px;
+        font-size: 20px;
+    }
+
+    button {
+        padding: 10px;
+        background: #1e3a8a;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .create-btn {
+        position: absolute;
+        top: 80px;
+        right: 40px;
+    }
+
+    .news-box {
+        background: linear-gradient(135deg, #facc15, #fb7185, #60a5fa);
+        padding: 20px;
+        border-radius: 10px;
+        color: black;
+        margin-bottom: 20px;
+    }
+</style>
+</head>
+
+<body>
+
+<nav>
+    <a onclick="showPage('home')">Home</a>
+    <a onclick="showPage('articles')">Articles</a>
+    <a onclick="showPage('create')">Create</a>
+    <a onclick="showPage('news')">News</a>
+    <a onclick="showPage('about')">About Us</a>
+</nav>
+
+<!-- HOME -->
+<section id="home" class="active">
+    <h1>Welcome to The Student Lens</h1>
+    <button onclick="sortByDate()">Sort by Date</button>
+    <div id="homeArticles"></div>
+</section>
+
+<!-- ARTICLES -->
+<section id="articles">
+    <h1>All Articles</h1>
+    <div id="allArticles"></div>
+</section>
+
+<!-- CREATE -->
+<section id="create">
+    <button class="create-btn" onclick="toggleCreate()">Create New Article</button>
+
+    <div id="createForm" style="display:none;">
+        <input id="title" placeholder="Article title"><br><br>
+        <textarea id="content" placeholder="Write your article..." rows="5"></textarea><br><br>
+        <button onclick="addArticle()">Publish</button>
+    </div>
+
+    <h2>Your Articles</h2>
+    <div id="myArticles"></div>
+</section>
+
+<!-- NEWS -->
+<section id="news">
+    <h1>Education Inequality Around the World 🌍</h1>
+
+    <div class="news-box">
+        📉 Over 250 million children worldwide lack access to basic education.
+    </div>
+
+    <div class="news-box">
+        🌍 In parts of Africa, schools often lack electricity, textbooks, and trained teachers.
+    </div>
+
+    <div class="news-box">
+        📚 In South Asia, poverty and gender inequality prevent millions from completing school.
+    </div>
+
+    <div class="news-box">
+        💻 Limited access to technology widens the global education gap.
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+    <h1>About Us</h1>
+    <p><strong>Name:</strong> PrimeMinister</p>
+    <p><strong>Email:</strong> daniyalharoon28@gmail.com</p>
+    <p><strong>Phone:</strong> 07407362261</p>
+</section>
+
+<script>
+let articles = JSON.parse(localStorage.getItem("articles")) || [];
+
+function showPage(id) {
+    document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    render();
+}
+
+function toggleCreate() {
+    createForm.style.display = createForm.style.display === "none" ? "block" : "none";
+}
+
+function addArticle() {
+    articles.unshift({
+        title: title.value,
+        content: content.value,
+        date: new Date().toISOString(),
+        reactions: {}
+    });
+    localStorage.setItem("articles", JSON.stringify(articles));
+    title.value = "";
+    content.value = "";
+    render();
+}
+
+function react(index, emoji) {
+    articles[index].reactions[emoji] = (articles[index].reactions[emoji] || 0) + 1;
+    localStorage.setItem("articles", JSON.stringify(articles));
+    render();
+}
+
+function sortByDate() {
+    articles.sort((a, b) => new Date(b.date) - new Date(a.date));
+    render();
+}
+
+function renderArticles(containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+
+    articles.forEach((a, i) => {
+        const div = document.createElement("div");
+        div.className = "article";
+
+        div.innerHTML = `
+            <h3>${a.title}</h3>
+            <p>${a.content}</p>
+            <small>${new Date(a.date).toDateString()}</small>
+            <div class="emoji-bar">
+                ${["🔥","❤️","😂","😮","😢","👏","👍","🎓","💡","✨"]
+                  .map(e => `<span onclick="react(${i}, '${e}')">${e} ${(a.reactions[e]||0)}</span>`).join("")}
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function render() {
+    renderArticles("homeArticles");
+    renderArticles("allArticles");
+    renderArticles("myArticles");
+}
+
+render();
+</script>
+
+</body>
+</html>
