@@ -6,21 +6,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+:root {
+  --blue: #2563eb;
+  --light: #eef6ff;
+  --card: #ffffff;
+  --text: #1f2937;
+}
+
 body {
   margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: #d9efff;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  background: var(--light);
+  color: var(--text);
 }
 
 header {
-  background: linear-gradient(90deg, #1e3a8a, #2563eb);
-  color: white;
-  padding: 20px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 20px 30px;
 }
 
 .logo {
-  font-size: 40px;
-  font-family: "Georgia", serif;
+  font-size: 36px;
+  font-family: Georgia, serif;
+  color: var(--blue);
 }
 
 nav {
@@ -28,23 +37,23 @@ nav {
 }
 
 nav button {
-  background: white;
+  background: none;
   border: none;
-  padding: 10px 16px;
-  margin: 5px;
-  border-radius: 20px;
-  font-weight: bold;
+  margin-right: 15px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  color: var(--text);
 }
 
 nav button:hover {
-  background: #e0e7ff;
+  color: var(--blue);
 }
 
 main {
   max-width: 1000px;
   margin: auto;
-  padding: 20px;
+  padding: 30px;
 }
 
 .page {
@@ -56,34 +65,51 @@ main {
 }
 
 .article {
-  background: white;
+  background: var(--card);
+  border-radius: 12px;
   padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.article img {
+  width: 100%;
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+}
+
+.article h3 {
+  margin-top: 0;
+}
+
+textarea, input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
 }
 
 textarea {
-  width: 100%;
-  height: 350px;
-  font-size: 16px;
+  height: 320px;
 }
 
-input {
-  width: 100%;
-  font-size: 18px;
-  padding: 8px;
-}
-
-.main-btn {
-  background: #2563eb;
+.btn {
+  background: var(--blue);
   color: white;
   border: none;
-  padding: 10px 16px;
+  padding: 10px 18px;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
 }
 
-.delete-btn {
+.btn.secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.btn.delete {
   background: crimson;
   margin-top: 10px;
 }
@@ -113,7 +139,7 @@ input {
 
 <section id="home" class="page active">
   <h1>Recommended for You</h1>
-  <button class="main-btn" onclick="sortArticles()">Sort by Date</button>
+  <button class="btn secondary" onclick="sortArticles()">Sort by date</button>
   <div id="homeFeed"></div>
 </section>
 
@@ -124,110 +150,9 @@ input {
 
 <section id="create" class="page">
   <h1>Create Article</h1>
-  <button class="main-btn" onclick="toggleCreate()">Create New Article</button>
+  <button class="btn" onclick="toggleCreate()">Create New Article</button>
 
-  <div id="createBox" style="display:none; margin-top:20px;">
+  <div id="createBox" style="display:none; margin-top:25px;">
     <input id="titleInput" placeholder="Article title"><br><br>
-    <textarea id="contentInput" placeholder="Write your article..."></textarea><br><br>
-    <button class="main-btn" onclick="publish()">Publish</button>
-  </div>
-
-  <h2>Your Articles</h2>
-  <div id="myArticles"></div>
-</section>
-
-<section id="news" class="page">
-  <h1>Education Inequality 🌍</h1>
-  <div class="article">📚 250 million children worldwide miss out on education.</div>
-  <div class="article">🏫 Many schools in Africa lack electricity or books.</div>
-  <div class="article">🚸 Girls in some regions are denied schooling.</div>
-  <div class="article">💻 Digital access remains unequal across Asia.</div>
-</section>
-
-<section id="about" class="page">
-  <h1>Contact</h1>
-  <p><strong>Name:</strong> PrimeMinister</p>
-  <p><strong>Email:</strong> daniyalharoon28@gmail.com</p>
-  <p><strong>Phone:</strong> 07407362261</p>
-</section>
-
-</main>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-
-let articles = JSON.parse(localStorage.getItem("articles")) || [];
-
-window.navigate = function(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-};
-
-window.toggleCreate = function() {
-  createBox.style.display = createBox.style.display === "none" ? "block" : "none";
-};
-
-window.publish = function() {
-  if (!titleInput.value || !contentInput.value) return;
-
-  articles.unshift({
-    title: titleInput.value,
-    content: contentInput.value,
-    date: new Date(),
-    reactions: {}
-  });
-
-  localStorage.setItem("articles", JSON.stringify(articles));
-  titleInput.value = "";
-  contentInput.value = "";
-  render();
-};
-
-window.deleteArticle = function(i) {
-  articles.splice(i, 1);
-  localStorage.setItem("articles", JSON.stringify(articles));
-  render();
-};
-
-window.react = function(i, e) {
-  articles[i].reactions[e] = (articles[i].reactions[e] || 0) + 1;
-  localStorage.setItem("articles", JSON.stringify(articles));
-  render();
-};
-
-window.sortArticles = function() {
-  articles.sort((a,b) => new Date(b.date) - new Date(a.date));
-  render();
-};
-
-function renderList(el, allowDelete) {
-  el.innerHTML = "";
-  articles.forEach((a,i) => {
-    const d = document.createElement("div");
-    d.className = "article";
-    d.innerHTML = `
-      <h3>${a.title}</h3>
-      <p>${a.content}</p>
-      <small>${new Date(a.date).toDateString()}</small>
-      <div class="emoji">
-        ${["🔥","❤️","😂","😮","😢","👏","👍","🎓","💡","✨"]
-        .map(x => `<span onclick="react(${i},'${x}')">${x} ${(a.reactions[x]||0)}</span>`).join("")}
-      </div>
-      ${allowDelete ? `<button class="delete-btn main-btn" onclick="deleteArticle(${i})">Delete</button>` : ""}
-    `;
-    el.appendChild(d);
-  });
-}
-
-function render() {
-  renderList(homeFeed, false);
-  renderList(allArticles, false);
-  renderList(myArticles, true);
-}
-
-render();
-});
-</script>
-
-</body>
-</html>
+    <input id="imageInput" placeholder="Image URL (optional)"><br><br>
+    <textarea id="contentInput" placeholder=
