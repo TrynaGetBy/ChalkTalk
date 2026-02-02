@@ -3,156 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <title>The Student Lens</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-:root {
-  --blue: #2563eb;
-  --light: #eef6ff;
-  --card: #ffffff;
-  --text: #1f2937;
-}
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #cfe9ff;
+    }
 
-body {
-  margin: 0;
-  font-family: "Inter", "Segoe UI", sans-serif;
-  background: var(--light);
-  color: var(--text);
-}
+    nav {
+        background: #1e3a8a;
+        padding: 15px;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+    }
 
-header {
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 20px 30px;
-}
-
-.logo {
-  font-size: 36px;
-  font-family: Georgia, serif;
-  color: var(--blue);
-}
-
-nav {
-  margin-top: 15px;
-}
-
-nav button {
-  background: none;
-  border: none;
-  margin-right: 15px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--text);
-}
-
-nav button:hover {
-  color: var(--blue);
-}
-
-main {
-  max-width: 1000px;
-  margin: auto;
-  padding: 30px;
-}
-
-.page {
-  display: none;
-}
-
-.page.active {
-  display: block;
-}
-
-.article {
-  background: var(--card);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 25px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-}
-
-.article img {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 15px;
-}
-
-.article h3 {
-  margin-top: 0;
-}
-
-textarea, input {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-}
-
-textarea {
-  height: 320px;
-}
-
-.btn {
-  background: var(--blue);
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.btn.secondary {
-  background: #e5e7eb;
-  color: #111827;
-}
-
-.btn.delete {
-  background: crimson;
-  margin-top: 10px;
-}
-
-.emoji span {
-  cursor: pointer;
-  font-size: 20px;
-  margin-right: 6px;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-  <div class="logo">The Student Lens</div>
-  <nav>
-    <button onclick="navigate('home')">Home</button>
-    <button onclick="navigate('articles')">Articles</button>
-    <button onclick="navigate('create')">Create</button>
-    <button onclick="navigate('news')">News</button>
-    <button onclick="navigate('about')">About Us</button>
-  </nav>
-</header>
-
-<main>
-
-<section id="home" class="page active">
-  <h1>Recommended for You</h1>
-  <button class="btn secondary" onclick="sortArticles()">Sort by date</button>
-  <div id="homeFeed"></div>
-</section>
-
-<section id="articles" class="page">
-  <h1>All Articles</h1>
-  <div id="allArticles"></div>
-</section>
-
-<section id="create" class="page">
-  <h1>Create Article</h1>
-  <button class="btn" onclick="toggleCreate()">Create New Article</button>
-
-  <div id="createBox" style="display:none; margin-top:25px;">
-    <input id="titleInput" placeholder="Article title"><br><br>
-    <input id="imageInput" placeholder="Image URL (optional)"><br><br>
-    <textarea id="contentInput" placeholder=
+    nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: poi
