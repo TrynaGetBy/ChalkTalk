@@ -6,85 +6,102 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --accent: #38bdf8;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+}
+
 body {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
-  background: #d9efff;
+  background: var(--bg);
+  color: var(--text);
 }
 
 header {
-  background: linear-gradient(90deg, #1e3a8a, #2563eb);
-  color: white;
+  background: #020617;
   padding: 20px;
+  border-bottom: 1px solid #1e293b;
 }
 
 .logo {
-  font-size: 40px;
-  font-family: "Georgia", serif;
+  font-size: 34px;
+  font-family: Georgia, serif;
+  color: var(--accent);
 }
 
 nav {
-  margin-top: 15px;
+  margin-top: 12px;
 }
 
 nav button {
-  background: white;
+  background: none;
   border: none;
-  padding: 10px 16px;
-  margin: 5px;
-  border-radius: 20px;
-  font-weight: bold;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: 16px;
   cursor: pointer;
 }
 
 nav button:hover {
-  background: #e0e7ff;
+  color: var(--accent);
 }
 
-main {
+section {
+  display: none;
   max-width: 1000px;
   margin: auto;
-  padding: 20px;
+  padding: 30px;
 }
 
-.page {
-  display: none;
-}
-
-.page.active {
+section.active {
   display: block;
 }
 
 .article {
-  background: white;
+  background: var(--card);
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   margin-bottom: 20px;
 }
 
-textarea {
+.article img {
   width: 100%;
-  height: 350px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  background: #020617;
+  color: var(--text);
+  border: 1px solid #1e293b;
+  border-radius: 8px;
   font-size: 16px;
 }
 
-input {
-  width: 100%;
-  font-size: 18px;
-  padding: 8px;
+textarea {
+  height: 280px;
 }
 
-.main-btn {
-  background: #2563eb;
-  color: white;
+button.main {
+  background: var(--accent);
+  color: #020617;
   border: none;
   padding: 10px 16px;
   border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.delete-btn {
-  background: crimson;
+button.delete {
+  background: #dc2626;
+  color: white;
   margin-top: 10px;
 }
 
@@ -94,11 +111,8 @@ input {
   margin-right: 6px;
 }
 
-.preview-img {
-  max-width: 200px;
-  margin-top: 10px;
-  border-radius: 8px;
-  display: none;
+small {
+  color: var(--muted);
 }
 </style>
 </head>
@@ -108,172 +122,58 @@ input {
 <header>
   <div class="logo">The Student Lens</div>
   <nav>
-    <button onclick="navigate('home')">Home</button>
-    <button onclick="navigate('articles')">Articles</button>
-    <button onclick="navigate('create')">Create</button>
-    <button onclick="navigate('news')">News</button>
-    <button onclick="navigate('about')">About Us</button>
+    <button onclick="goTo('home')">Home</button>
+    <button onclick="goTo('articles')">Articles</button>
+    <button onclick="goTo('create')">Create</button>
+    <button onclick="goTo('news')">News</button>
+    <button onclick="goTo('about')">About Us</button>
   </nav>
 </header>
 
-<main>
-
-<section id="home" class="page active">
-  <h1>Recommended for You</h1>
-  <button class="main-btn" onclick="sortArticles()">Sort by Date</button>
-  <div id="homeFeed"></div>
+<section id="home" class="active">
+  <h1>Home</h1>
+  <button class="main" onclick="sortByDate()">Sort by date</button>
+  <div id="homeList"></div>
 </section>
 
-<section id="articles" class="page">
+<section id="articles">
   <h1>All Articles</h1>
-  <div id="allArticles"></div>
+  <div id="articleList"></div>
 </section>
 
-<section id="create" class="page">
+<section id="create">
   <h1>Create Article</h1>
-  <button class="main-btn" onclick="toggleCreate()">Create New Article</button>
+  <button class="main" onclick="toggleForm()">Create New Article</button>
 
-  <div id="createBox" style="display:none; margin-top:20px;">
-    <input id="titleInput" placeholder="Article title"><br><br>
-
-    <!-- IMAGE UPLOAD -->
-    <input type="file" id="imageInput" accept="image/*" style="display:none;">
-    <button class="main-btn" onclick="document.getElementById('imageInput').click()">Add Image</button>
-    <br><br>
-    <img id="previewImage" class="preview-img">
-
-    <textarea id="contentInput" placeholder="Write your article..."></textarea><br><br>
-    <button class="main-btn" onclick="publish()">Publish</button>
+  <div id="form" style="display:none; margin-top:20px;">
+    <input id="title" placeholder="Article title"><br><br>
+    <input id="image" placeholder="Image URL (optional)"><br><br>
+    <textarea id="content" placeholder="Write your article..."></textarea><br><br>
+    <button class="main" onclick="addArticle()">Publish</button>
   </div>
 
   <h2>Your Articles</h2>
-  <div id="myArticles"></div>
+  <div id="myList"></div>
 </section>
 
-<section id="news" class="page">
-  <h1>Education Inequality 🌍</h1>
-  <div class="article">📚 250 million children worldwide miss out on education.</div>
-  <div class="article">🏫 Many schools in Africa lack electricity or books.</div>
-  <div class="article">🚸 Girls in some regions are denied schooling.</div>
-  <div class="article">💻 Digital access remains unequal across Asia.</div>
+<section id="news">
+  <h1>Global Education Inequality 🌍</h1>
+
+  <div class="article">📚 Over 250 million children worldwide are out of school.</div>
+  <div class="article">🏫 Many schools in Africa lack electricity and textbooks.</div>
+  <div class="article">🚸 Girls face major barriers to education in some regions.</div>
+  <div class="article">💻 Digital inequality blocks access to online learning.</div>
+  <div class="article">🌍 Children in conflict zones are twice as likely to miss school.</div>
 </section>
 
-<section id="about" class="page">
-  <h1>Contact</h1>
+<section id="about">
+  <h1>About Us</h1>
   <p><strong>Name:</strong> PrimeMinister</p>
   <p><strong>Email:</strong> daniyalharoon28@gmail.com</p>
   <p><strong>Phone:</strong> 07407362261</p>
 </section>
 
-</main>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-
-let articles = JSON.parse(localStorage.getItem("articles")) || [];
-let selectedImage = "";
-
-// IMAGE PREVIEW HANDLER
-document.getElementById("imageInput").addEventListener("change", function() {
-  const file = this.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    selectedImage = e.target.result;
-    const preview = document.getElementById("previewImage");
-    preview.src = selectedImage;
-    preview.style.display = "block";
-  };
-  reader.readAsDataURL(file);
-});
-
-// PAGE NAVIGATION
-window.navigate = function(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-};
-
-// TOGGLE CREATE FORM
-window.toggleCreate = function() {
-  createBox.style.display = createBox.style.display === "none" ? "block" : "none";
-};
-
-// PUBLISH ARTICLE
-window.publish = function() {
-  if (!titleInput.value || !contentInput.value) return;
-
-  articles.unshift({
-    title: titleInput.value,
-    content: contentInput.value,
-    image: selectedImage,
-    date: new Date(),
-    reactions: {}
-  });
-
-  localStorage.setItem("articles", JSON.stringify(articles));
-
-  titleInput.value = "";
-  contentInput.value = "";
-  selectedImage = "";
-  previewImage.style.display = "none";
-
-  render();
-};
-
-// DELETE ARTICLE
-window.deleteArticle = function(i) {
-  if (!confirm("Delete this article permanently?")) return;
-  articles.splice(i, 1);
-  localStorage.setItem("articles", JSON.stringify(articles));
-  render();
-};
-
-// REACT
-window.react = function(i, emoji) {
-  articles[i].reactions[emoji] = (articles[i].reactions[emoji] || 0) + 1;
-  localStorage.setItem("articles", JSON.stringify(articles));
-  render();
-};
-
-// SORT
-window.sortArticles = function() {
-  articles.sort((a,b) => new Date(b.date) - new Date(a.date));
-  render();
-};
-
-// RENDER ARTICLES
-function renderList(el, allowDelete) {
-  el.innerHTML = "";
-  articles.forEach((a,i) => {
-    const d = document.createElement("div");
-    d.className = "article";
-
-    d.innerHTML = `
-      ${a.image ? `<img src="${a.image}" style="width:100%; border-radius:10px; margin-bottom:10px;">` : ""}
-      <h3>${a.title}</h3>
-      <p>${a.content}</p>
-      <small>${new Date(a.date).toDateString()}</small>
-      <div class="emoji">
-        ${["🔥","❤️","😂","😮","😢","👏","👍","🎓","💡","✨"]
-          .map(e => `<span onclick="react(${i},'${e}')">${e} ${(a.reactions[e]||0)}</span>`).join("")}
-      </div>
-      ${allowDelete ? `<button class="delete-btn main-btn" onclick="deleteArticle(${i})">Delete</button>` : ""}
-    `;
-
-    el.appendChild(d);
-  });
-}
-
-function render() {
-  renderList(homeFeed, false);
-  renderList(allArticles, false);
-  renderList(myArticles, true);
-}
-
-render();
-});
-</script>
-
+<!-- LINK TO JS -->
+<script src="script.js"></script>
 </body>
 </html>
