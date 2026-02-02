@@ -48,6 +48,8 @@
         max-width: 100%;
         border-radius: 8px;
         margin-top: 10px;
+        resize: both;
+        overflow: auto;
     }
 
     .emoji-bar span {
@@ -99,6 +101,17 @@
         margin-top: 10px;
         margin-right: 10px;
     }
+
+    #dropArea {
+        border: 2px dashed #1e3a8a;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        display: none;
+        cursor: pointer;
+        background: #e0f0ff;
+    }
 </style>
 </head>
 
@@ -137,7 +150,8 @@
     <div id="createForm" style="display:none; max-width:600px; margin-top:20px;">
         <input id="title" placeholder="Article title"><br><br>
         <textarea id="content" placeholder="Write your article..." rows="10"></textarea><br><br>
-        <input type="file" id="imageInput" accept="image/*"><br><br>
+        <button type="button" onclick="toggleDropArea()">Add Image</button><br><br>
+        <div id="dropArea">Drag & Drop Image Here or Click to Select</div>
         <button onclick="addArticle()">Publish</button>
     </div>
 
@@ -176,6 +190,7 @@
 
 <script>
 let articles = JSON.parse(localStorage.getItem("articles")) || [];
+let currentImage = null;
 
 function showPage(id) {
     document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
@@ -187,33 +202,61 @@ function toggleCreate() {
     createForm.style.display = createForm.style.display === "none" ? "block" : "none";
 }
 
-function addArticle() {
-    const imageFile = document.getElementById("imageInput").files[0];
-
-    if (imageFile) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            saveArticle(e.target.result);
-        };
-        reader.readAsDataURL(imageFile);
-    } else {
-        saveArticle(null);
-    }
+function toggleDropArea() {
+    const dropArea = document.getElementById("dropArea");
+    dropArea.style.display = dropArea.style.display === "none" ? "block" : "none";
 }
 
-function saveArticle(imageData) {
+const dropArea = document.getElementById("dropArea");
+
+dropArea.addEventListener("click", () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.onchange = () => handleFile(fileInput.files[0]);
+    fileInput.click();
+});
+
+dropArea.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropArea.style.background = "#c0e0ff";
+});
+
+dropArea.addEventListener("dragleave", () => {
+    dropArea.style.background = "#e0f0ff";
+});
+
+dropArea.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropArea.style.background = "#e0f0ff";
+    handleFile(e.dataTransfer.files[0]);
+});
+
+function handleFile(file) {
+    if (!file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        currentImage = e.target.result;
+        dropArea.innerHTML = `<img src="${currentImage}" style="max-width:100%; margin-top:10px;" id="previewImage">`;
+    };
+    reader.readAsDataURL(file);
+}
+
+function addArticle() {
     articles.unshift({
         title: title.value,
         content: content.value,
         date: new Date().toISOString(),
         reactions: {},
-        image: imageData
+        image: currentImage
     });
 
     localStorage.setItem("articles", JSON.stringify(articles));
     title.value = "";
     content.value = "";
-    document.getElementById("imageInput").value = "";
+    currentImage = null;
+    dropArea.innerHTML = "Drag & Drop Image Here or Click to Select";
+    dropArea.style.display = "none";
     render();
 }
 
@@ -236,33 +279,26 @@ function editArticle(index) {
     createForm.style.display = "block";
     title.value = article.title;
     content.value = article.content;
-    
+    currentImage = article.image;
+    if (currentImage) {
+        dropArea.innerHTML = `<img src="${currentImage}" style="max-width:100%; margin-top:10px;" id="previewImage">`;
+        dropArea.style.display = "block";
+    }
+
     const originalAdd = addArticle;
     addArticle = function() {
-        const imageFile = document.getElementById("imageInput").files[0];
-
-        if (imageFile) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                saveEdit(e.target.result);
-            };
-            reader.readAsDataURL(imageFile);
-        } else {
-            saveEdit(article.image);
-        }
-
-        function saveEdit(imageData) {
-            article.title = title.value;
-            article.content = content.value;
-            article.image = imageData;
-            localStorage.setItem("articles", JSON.stringify(articles));
-            title.value = "";
-            content.value = "";
-            document.getElementById("imageInput").value = "";
-            addArticle = originalAdd;
-            render();
-            createForm.style.display = "none";
-        }
+        article.title = title.value;
+        article.content = content.value;
+        article.image = currentImage;
+        localStorage.setItem("articles", JSON.stringify(articles));
+        title.value = "";
+        content.value = "";
+        dropArea.innerHTML = "Drag & Drop Image Here or Click to Select";
+        dropArea.style.display = "none";
+        currentImage = null;
+        addArticle = originalAdd;
+        render();
+        createForm.style.display = "none";
     };
 }
 
@@ -299,8 +335,8 @@ function renderArticles(containerId) {
 
         div.innerHTML = `
             <h3>${a.title}</h3>
-            <p>${a.content}</p>
             ${imageHTML}
+            <p>${a.content}</p>
             <small>${new Date(a.date).toDateString()}</small>
             <div class="emoji-bar">${reactionsHTML}</div>
             <div>${actionsHTML}</div>
@@ -321,3 +357,4 @@ render();
 
 </body>
 </html>
+
