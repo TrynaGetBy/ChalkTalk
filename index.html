@@ -44,6 +44,12 @@
         border-radius: 8px;
     }
 
+    .article img {
+        max-width: 100%;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+
     .emoji-bar span {
         cursor: pointer;
         margin-right: 8px;
@@ -131,6 +137,7 @@
     <div id="createForm" style="display:none; max-width:600px; margin-top:20px;">
         <input id="title" placeholder="Article title"><br><br>
         <textarea id="content" placeholder="Write your article..." rows="10"></textarea><br><br>
+        <input type="file" id="imageInput" accept="image/*"><br><br>
         <button onclick="addArticle()">Publish</button>
     </div>
 
@@ -181,15 +188,32 @@ function toggleCreate() {
 }
 
 function addArticle() {
+    const imageFile = document.getElementById("imageInput").files[0];
+
+    if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            saveArticle(e.target.result);
+        };
+        reader.readAsDataURL(imageFile);
+    } else {
+        saveArticle(null);
+    }
+}
+
+function saveArticle(imageData) {
     articles.unshift({
         title: title.value,
         content: content.value,
         date: new Date().toISOString(),
-        reactions: {}
+        reactions: {},
+        image: imageData
     });
+
     localStorage.setItem("articles", JSON.stringify(articles));
     title.value = "";
     content.value = "";
+    document.getElementById("imageInput").value = "";
     render();
 }
 
@@ -212,17 +236,33 @@ function editArticle(index) {
     createForm.style.display = "block";
     title.value = article.title;
     content.value = article.content;
-
+    
     const originalAdd = addArticle;
     addArticle = function() {
-        article.title = title.value;
-        article.content = content.value;
-        localStorage.setItem("articles", JSON.stringify(articles));
-        title.value = "";
-        content.value = "";
-        addArticle = originalAdd;
-        render();
-        createForm.style.display = "none";
+        const imageFile = document.getElementById("imageInput").files[0];
+
+        if (imageFile) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                saveEdit(e.target.result);
+            };
+            reader.readAsDataURL(imageFile);
+        } else {
+            saveEdit(article.image);
+        }
+
+        function saveEdit(imageData) {
+            article.title = title.value;
+            article.content = content.value;
+            article.image = imageData;
+            localStorage.setItem("articles", JSON.stringify(articles));
+            title.value = "";
+            content.value = "";
+            document.getElementById("imageInput").value = "";
+            addArticle = originalAdd;
+            render();
+            createForm.style.display = "none";
+        }
     };
 }
 
@@ -255,9 +295,12 @@ function renderArticles(containerId) {
             <button onclick="deleteArticle(${i})">Delete</button>
         `;
 
+        const imageHTML = a.image ? `<img src="${a.image}">` : "";
+
         div.innerHTML = `
             <h3>${a.title}</h3>
             <p>${a.content}</p>
+            ${imageHTML}
             <small>${new Date(a.date).toDateString()}</small>
             <div class="emoji-bar">${reactionsHTML}</div>
             <div>${actionsHTML}</div>
